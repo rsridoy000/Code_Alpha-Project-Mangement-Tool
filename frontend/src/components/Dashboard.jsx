@@ -199,7 +199,10 @@ const Dashboard = () => {
                     <div style={{ padding: '0.5rem', background: 'var(--primary-glow)', borderRadius: '8px', color: 'var(--accent)' }}>
                       <Folder size={20} />
                     </div>
-                    <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>{project.name}</h3>
+                    <div>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 700, display: 'block', marginBottom: '0.15rem' }}>Project #{project.id}</span>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: 700, lineHeight: 1.2 }}>{project.name}</h3>
+                    </div>
                   </div>
                   {(currentUser?.is_manager || project.owner === currentUser?.id) && (
                     <button

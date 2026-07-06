@@ -496,7 +496,12 @@ const Board = () => {
               <X size={18} />
             </button>
 
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>{activeTask.title}</h2>
+            <div style={{ marginBottom: '1rem' }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'rgba(99,102,241,0.12)', border: '1px solid var(--primary)', borderRadius: '6px', padding: '0.2rem 0.6rem', display: 'inline-block', marginBottom: '0.5rem' }}>
+                Task #{activeTask.id}
+              </span>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>{activeTask.title}</h2>
+            </div>
             
             {/* Split Panel Controls */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -568,16 +573,23 @@ const Board = () => {
                 <Paperclip size={18} /> Attachments
               </h3>
               
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
-                {activeTask.attachments && activeTask.attachments.map((attach) => (
-                  <div key={attach.id} className="glass-card" style={{ padding: '0.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
-                    <a href={`http://localhost:8000${attach.file}`} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
-                      {attach.file.split('/').pop()}
-                    </a>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
+                {activeTask.attachments && activeTask.attachments.length > 0 ? (
+                  activeTask.attachments.map((attach, attachIdx) => (
+                    <div key={attachIdx} className="glass-card" style={{ padding: '0.5rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 700, opacity: 0.7 }}>Task #{activeTask.id}</span>
+                      <span style={{ color: 'var(--border)' }}>·</span>
+                      <a href={`http://localhost:8000${attach.file}`} target="_blank" rel="noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'none' }}>
+                        📎 {attach.file.split('/').pop()}
+                      </a>
+                    </div>
+                  ))
+                ) : (
+                  <div className="glass-card" style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', opacity: 0.6 }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 700 }}>Task #{activeTask.id}</span>
+                    <span style={{ color: 'var(--border)' }}>·</span>
+                    <span style={{ color: 'var(--text-muted)' }}>No Attachments</span>
                   </div>
-                ))}
-                {(!activeTask.attachments || activeTask.attachments.length === 0) && (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No attachments uploaded.</p>
                 )}
               </div>
 

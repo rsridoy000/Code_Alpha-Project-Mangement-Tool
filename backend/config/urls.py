@@ -19,7 +19,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.shortcuts import redirect
+
+def redirect_to_frontend(request):
+    return redirect('http://localhost:5173/')
+
 urlpatterns = [
+    path('', redirect_to_frontend, name='root-redirect'),
     path('admin/', admin.site.urls),
     path('api/auth/', include('users.urls')),
     path('api/', include('projects.urls')),

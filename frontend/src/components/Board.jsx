@@ -246,10 +246,11 @@ const Board = () => {
     let totalTasks = 0;
     let completedTasks = 0;
 
-    project.lists.forEach((list, idx) => {
+    project.lists.forEach((list) => {
       totalTasks += list.tasks.length;
-      // Classify the last list, or list named 'Completed'/'Done' as complete
-      if (idx === project.lists.length - 1 || list.name.toLowerCase().includes('completed') || list.name.toLowerCase().includes('done')) {
+      // Only count tasks in lists explicitly named 'Done' or 'Completed'
+      const lname = list.name.toLowerCase();
+      if (lname.includes('done') || lname.includes('completed') || lname.includes('complete')) {
         completedTasks += list.tasks.length;
       }
     });
@@ -374,7 +375,8 @@ const Board = () => {
                                   </span>
                                 )}
                               </div>
-                              <h5 style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '0.5rem' }}>{task.title}</h5>
+                              <h5 style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '0.35rem' }}>{task.title}</h5>
+                              <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.35rem', opacity: 0.6 }}>Task #{task.id}</p>
                               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                 {task.description || 'No description.'}
                               </p>
@@ -581,12 +583,12 @@ const Board = () => {
 
               <input
                 type="file"
-                id="file-upload"
+                id={`file-upload-${activeTask.id}`}
                 onChange={handleFileUpload}
                 style={{ display: 'none' }}
               />
-              <label htmlFor="file-upload" className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', cursor: 'pointer' }}>
-                <Plus size={16} /> Upload Attachment File
+              <label htmlFor={`file-upload-${activeTask.id}`} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', cursor: 'pointer' }}>
+                <Plus size={16} /> Upload Attachment
               </label>
             </div>
 

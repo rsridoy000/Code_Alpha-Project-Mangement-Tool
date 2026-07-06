@@ -89,12 +89,13 @@ const Dashboard = () => {
     let total = 0, completed = 0, inProgress = 0, highPriority = 0;
     projects.forEach(p => {
       if (!p.lists) return;
-      p.lists.forEach((list, idx) => {
+      p.lists.forEach((list) => {
+        const lname = list.name.toLowerCase();
         list.tasks && list.tasks.forEach(task => {
           total++;
-          if (idx === p.lists.length - 1 || list.name.toLowerCase().includes('done') || list.name.toLowerCase().includes('complete')) {
+          if (lname.includes('done') || lname.includes('completed') || lname.includes('complete')) {
             completed++;
-          } else if (list.name.toLowerCase().includes('progress')) {
+          } else if (lname.includes('progress')) {
             inProgress++;
           }
           if (task.priority === 'HIGH') highPriority++;
@@ -107,9 +108,10 @@ const Dashboard = () => {
   const getProjectProgress = (project) => {
     if (!project.lists || project.lists.length === 0) return 0;
     let total = 0, done = 0;
-    project.lists.forEach((list, idx) => {
+    project.lists.forEach((list) => {
+      const lname = list.name.toLowerCase();
       total += list.tasks ? list.tasks.length : 0;
-      if (idx === project.lists.length - 1 || list.name.toLowerCase().includes('done') || list.name.toLowerCase().includes('complete')) {
+      if (lname.includes('done') || lname.includes('completed') || lname.includes('complete')) {
         done += list.tasks ? list.tasks.length : 0;
       }
     });

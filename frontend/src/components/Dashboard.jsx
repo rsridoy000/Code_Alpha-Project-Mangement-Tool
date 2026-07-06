@@ -6,6 +6,7 @@ import { Plus, Users, Folder, ChevronRight, BarChart2, CheckCircle, Clock, Alert
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -13,9 +14,19 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    fetchCurrentUser();
     fetchProjects();
     fetchUsers();
   }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await API.get('auth/me/');
+      setCurrentUser(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -122,10 +133,12 @@ const Dashboard = () => {
           <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Workspace Dashboard</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Manage and track all collaborative projects</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={20} />
-          New Project
-        </button>
+        {currentUser?.is_manager && (
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+            <Plus size={20} />
+            New Project
+          </button>
+        )}
       </div>
 
       {/* Stats Overview */}
@@ -186,13 +199,15 @@ const Dashboard = () => {
                     </div>
                     <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>{project.name}</h3>
                   </div>
-                  <button
-                    onClick={(e) => handleDeleteProject(e, project.id)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0.25rem' }}
-                    title="Delete project"
-                  >
-                    <Trash2 size={15} />
-                  </button>
+                  {(currentUser?.is_manager || project.owner === currentUser?.id) && (
+                    <button
+                      onClick={(e) => handleDeleteProject(e, project.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0.25rem' }}
+                      title="Delete project"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  )}
                 </div>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {project.description || 'No description provided.'}
@@ -233,8 +248,15 @@ const Dashboard = () => {
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem 2rem' }}>
             <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📋</div>
             <h3 style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '0.5rem' }}>No projects yet</h3>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Create your first project to get started with your team!</p>
-            <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={18} /> Create First Project</button>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+              {currentUser?.is_manager 
+                ? 'Create your first project to get started with your team!'
+                : 'Ask your manager to assign you to a project to get started!'
+              }
+            </p>
+            {currentUser?.is_manager && (
+              <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={18} /> Create First Project</button>
+            )}
           </div>
         )}
       </div>

@@ -29,7 +29,18 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Project.objects.filter(Q(owner=self.request.user) | Q(members=self.request.user)).distinct()
 
     def perform_create(self, serializer):
+        from rest_framework.exceptions import PermissionDenied
+        if not (self.request.user.is_staff or self.request.user.is_superuser):
+            raise PermissionDenied("Only managers or administrators can create projects.")
         serializer.save()
+
+    def destroy(self, request, *args, **kwargs):
+        project = self.get_object()
+        from rest_framework.exceptions import PermissionDenied
+        if not (request.user.is_staff or request.user.is_superuser or project.owner == request.user):
+            raise PermissionDenied("Only managers, administrators, or the project owner can delete projects.")
+        return super().destroy(request, *args, **kwargs)
+
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def add_member(self, request, pk=None):

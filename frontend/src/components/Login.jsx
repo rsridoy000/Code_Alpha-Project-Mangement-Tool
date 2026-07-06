@@ -19,6 +19,7 @@ const Login = () => {
       // Fetch full user profile to get ID and avatar
       const userRes = await API.get('auth/me/');
       localStorage.setItem('userId', userRes.data.id);
+      localStorage.setItem('isManager', userRes.data.is_manager ? 'true' : 'false');
       if (userRes.data.avatar_url) {
         localStorage.setItem('avatarUrl', userRes.data.avatar_url);
       }

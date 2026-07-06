@@ -5,14 +5,19 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     avatar_url = serializers.SerializerMethodField()
+    is_manager = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name', 'avatar', 'avatar_url')
+        fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name', 'avatar', 'avatar_url', 'is_manager')
         extra_kwargs = {
             'password': {'write_only': True, 'required': False},
             'avatar': {'required': False, 'write_only': True},
         }
+
+    def get_is_manager(self, obj):
+        return obj.is_staff or obj.is_superuser
+
 
     def get_avatar_url(self, obj):
         if obj.avatar:

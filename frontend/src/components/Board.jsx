@@ -153,51 +153,20 @@ const Board = () => {
     setShowTaskModal(true);
   };
 
-  const handleSaveDescription = async () => {
+  const handleSaveTaskDetails = async () => {
     try {
       const response = await API.patch(`tasks/${activeTask.id}/`, {
-        description: editDesc
+        description: editDesc,
+        priority: selectedPriority,
+        due_date: selectedDueDate || null,
+        assigned_to: selectedAssignee ? parseInt(selectedAssignee) : null,
       });
-      setActiveTask({ ...activeTask, description: response.data.description });
-      setIsEditingDesc(false);
+      setActiveTask(response.data);
       fetchProject();
+      alert("Changes saved successfully!");
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const handlePriorityChange = async (priority) => {
-    try {
-      const res = await API.patch(`tasks/${activeTask.id}/`, { priority });
-      setActiveTask({ ...activeTask, priority: res.data.priority });
-      setSelectedPriority(priority);
-      fetchProject();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDueDateChange = async (dueDate) => {
-    try {
-      const res = await API.patch(`tasks/${activeTask.id}/`, { due_date: dueDate || null });
-      setActiveTask({ ...activeTask, due_date: res.data.due_date });
-      setSelectedDueDate(dueDate);
-      fetchProject();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleAssigneeChange = async (userId) => {
-    try {
-      const res = await API.patch(`tasks/${activeTask.id}/`, {
-        assigned_to: userId ? parseInt(userId) : null
-      });
-      setActiveTask({ ...activeTask, assigned_to: res.data.assigned_to, assigned_to_detail: res.data.assigned_to_detail });
-      setSelectedAssignee(userId);
-      fetchProject();
-    } catch (err) {
-      console.error(err);
+      alert("Failed to save changes.");
     }
   };
 
@@ -538,7 +507,7 @@ const Board = () => {
                   className="form-input"
                   style={{ padding: '0.4rem', fontSize: '0.9rem' }}
                   value={selectedAssignee}
-                  onChange={(e) => handleAssigneeChange(e.target.value)}
+                  onChange={(e) => setSelectedAssignee(e.target.value)}
                 >
                   <option value="">Unassigned</option>
                   {project.members_detail && project.members_detail.map((m) => (
@@ -556,7 +525,7 @@ const Board = () => {
                   className="form-input"
                   style={{ padding: '0.4rem', fontSize: '0.9rem' }}
                   value={selectedPriority}
-                  onChange={(e) => handlePriorityChange(e.target.value)}
+                  onChange={(e) => setSelectedPriority(e.target.value)}
                 >
                   <option value="LOW">Low Priority</option>
                   <option value="MEDIUM">Medium Priority</option>
@@ -574,7 +543,7 @@ const Board = () => {
                   className="form-input"
                   style={{ padding: '0.4rem', fontSize: '0.9rem' }}
                   value={selectedDueDate}
-                  onChange={(e) => handleDueDateChange(e.target.value)}
+                  onChange={(e) => setSelectedDueDate(e.target.value)}
                 />
               </div>
             </div>
@@ -582,27 +551,13 @@ const Board = () => {
             {/* Description */}
             <div className="form-group">
               <label className="form-label">Description</label>
-              {isEditingDesc ? (
-                <div>
-                  <textarea
-                    className="form-input"
-                    style={{ minHeight: '100px', width: '100%', resize: 'vertical' }}
-                    value={editDesc}
-                    onChange={(e) => setEditDesc(e.target.value)}
-                  />
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                    <button className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={handleSaveDescription}>Save</button>
-                    <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => setIsEditingDesc(false)}>Cancel</button>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  onClick={() => setIsEditingDesc(true)}
-                  style={{ padding: '0.75rem', border: '1px solid var(--border)', borderRadius: '8px', cursor: 'pointer', background: 'rgba(255,255,255,0.01)', minHeight: '60px' }}
-                >
-                  {activeTask.description || <span style={{ color: 'var(--text-muted)' }}>No description. Click to add one.</span>}
-                </div>
-              )}
+              <textarea
+                className="form-input"
+                style={{ minHeight: '100px', width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
+                value={editDesc}
+                onChange={(e) => setEditDesc(e.target.value)}
+                placeholder="Write task description here..."
+              />
             </div>
 
             {/* File Uploads / Attachments */}
@@ -676,7 +631,10 @@ const Board = () => {
               <button className="btn btn-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={handleDeleteTask}>
                 <Trash2 size={16} /> Delete Task
               </button>
-              <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => setShowTaskModal(false)}>Close</button>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="btn btn-secondary" style={{ padding: '0.5rem 1.5rem', fontSize: '0.85rem' }} onClick={() => setShowTaskModal(false)}>Close</button>
+                <button className="btn btn-primary" style={{ padding: '0.5rem 2rem', fontSize: '0.85rem' }} onClick={handleSaveTaskDetails}>Save Changes</button>
+              </div>
             </div>
           </div>
         </div>
